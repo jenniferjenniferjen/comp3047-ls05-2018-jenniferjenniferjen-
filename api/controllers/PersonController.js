@@ -8,119 +8,124 @@
 module.exports = {
 
     // action - create
-create: async function (req, res) {
-    if (req.method == "POST") {
+
+    create: async function (req, res) {
+
+        if (req.method == "GET")
+            return res.view('person/create');
+
+        if (typeof req.body.Person === "undefined")
+            return res.badRequest("Form-data not received.");
 
         await Person.create(req.body.Person);
-        return res.send("Successfully Created!");
 
-    } else {
-        return res.view('person/create');
-    }
-},
-  
-// action - index
-index: async function (req, res) {
+        return res.ok("Successfully created!");
+    },
 
-    var persons = await Person.find();
-    return res.view('person/index', { 'persons': persons });
-    
-},
+    // action - index
+    index: async function (req, res) {
 
-// action - view
-view: async function (req, res) {
+        var persons = await Person.find();
+        return res.view('person/index', { 'persons': persons });
 
-    var pid = parseInt(req.params.id) || -1;
-    
-    var model = await Person.findOne(pid);
-    
-    if (model != null)
+    },
+
+    // action - view
+    view: async function (req, res) {
+
+        var message = Person.getInvalidIdMsg(req.params);
+
+        if (message) return res.badRequest(message);
+
+        var model = await Person.findOne(req.params.id);
+
+        if (!model) return res.notFound();
+
         return res.view('person/view', { 'person': model });
-    else
-        return res.send("No such person");
-},
 
-// action - delete 
-delete: async function (req, res) {
+    },
 
-    if (req.method == "POST") {
-        const pid = parseInt(req.params.id) || -1;
+    // action - delete 
+    delete: async function (req, res) {
 
-        var models = await Person.destroy(pid).fetch();
+        if (req.method == "POST") {
+            const pid = parseInt(req.params.id) || -1;
 
-        if (models.length > 0)
-            return res.send("Person Deleted.");
-        else
-            return res.send("Person not found.");
+            var models = await Person.destroy(pid).fetch();
 
-    } else {
-        return res.send("Request Forbidden");
-    }
-},
-// action - update
-update: async function (req, res) {
+            if (models.length > 0)
+                return res.send("Person Deleted.");
+            else
+                return res.send("Person not found.");
 
-    var pid = parseInt(req.params.id) || -1;
+        } else {
+            return res.send("Request Forbidden");
+        }
+    },
+    // action - update
+    update: async function (req, res) {
 
-    if (req.method == "GET") {
-            
-        var model = await Person.findOne(pid);
+        var pid = parseInt(req.params.id) || -1;
 
-        if (model != null)
-            return res.view('person/update', { 'person': model });
-        else
-            return res.send("No such person!");
+        if (req.method == "GET") {
 
-    } else {
-        
-        var models = await Person.update(pid).set({
-            name: req.body.Person.name,
-            age: req.body.Person.age
-        }).fetch();
+            var model = await Person.findOne(pid);
 
-        if (models.length > 0)
-            return res.send("Record updated");
-        else
-            return res.send("No such person!");
+            if (model != null)
+                return res.view('person/update', { 'person': model });
+            else
+                return res.send("No such person!");
 
-    }
-},
+        } else {
 
-// action - search
-search: async function (req, res) {
+            var models = await Person.update(pid).set({
+                name: req.body.Person.name,
+                age: req.body.Person.age
+            }).fetch();
 
-    const qName = req.query.name || "";
-    const qAge = req.query.age || "";
+            if (models.length > 0)
+                return res.send("Record updated");
+            else
+                return res.send("No such person!");
 
-    if (qAge == "") {
+        }
+    },
 
-        var persons = await Person.find()
-            .where({ name: { contains: qName } })
-            .sort('name');
+    // action - search
+    search: async function (req, res) {
 
-        return res.view('person/index', { 'persons': persons });
+        const qName = req.query.name || "";
+        const qAge = req.query.age || "";
 
-    } else {
+        if (qAge == "") {
 
-        var persons = await Person.find()
-            .where({ name: { contains: qName } })
-            .where({ age: qAge })
-            .sort('name');
+            var persons = await Person.find()
+                .where({ name: { contains: qName } })
+                .sort('name');
 
-        return res.view('person/index', { 'persons': persons });
-    }
-},
+            return res.view('person/index', { 'persons': persons });
 
-// action - paginate
-paginate: async function (req, res) {
+        } else {
 
-    const qPage = req.query.page - 1 || 0;
+            var persons = await Person.find()
+                .where({ name: { contains: qName } })
+                .where({ age: qAge })
+                .sort('name');
 
-    var persons = await Person.find().paginate(qPage, 2);
+            return res.view('person/index', { 'persons': persons });
+        }
+    },
 
-    var numOfPage = Math.ceil(await Person.count() / 2);
+    // action - paginate
+    paginate: async function (req, res) {
 
-    return res.view('person/paginate', { 'persons': persons, 'count': numOfPage });
-},
+        const qPage = req.query.page - 1 || 0;
+
+        var persons = await Person.find().paginate(qPage, 2);
+
+        var numOfPage = Math.ceil(await Person.count() / 2);
+
+        return res.view('person/paginate', { 'persons': persons, 'count': numOfPage });
+    },
 };
 
