@@ -17,7 +17,7 @@ module.exports = {
       type: "string"
     },
     age: {
-      type: "string"
+      type: "number"
     }
 
 
