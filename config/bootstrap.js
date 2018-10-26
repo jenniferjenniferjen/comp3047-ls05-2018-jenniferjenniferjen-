@@ -9,23 +9,50 @@
  * https://sailsjs.com/config/bootstrap
  */
 
-module.exports.bootstrap = async function(done) {
+module.exports.bootstrap = async function (done) {
+
+  sails.bcrypt = require('bcrypt');
+  const saltRounds = 10;//before if
+
+  sails.getInvalidIdMsg = function (opts) {
+
+    if (opts.id && isNaN(parseInt(opts.id))) {
+        return "Primary key specfied is invalid (incorrect type).";
+    }
+
+    if (opts.fk && isNaN(parseInt(opts.fk))) {
+        return "Foreign key specfied is invalid (incorrect type).";
+    }
+
+    return null;        // falsy
+
+}
 
   if (await Person.count() > 0) {
     return done();
-}
+  }
 
-await Person.createEach([
+  await Person.createEach([
     { "name": "Martin Choy", "age": "23", "id": 635 },
     { "name": "Kenny Cheng", "age": "22", "id": 637 }
     // etc.
-]);
+  ]);
 
-await User.createEach([
-  { "username": "admin", "password": "123456" },
-  { "username": "boss", "password": "123456" }
-  // etc.
-]); //to fill in
+  const hash = await sails.bcrypt.hash('123456', saltRounds);//sails lift drop first!!
+
+  await User.createEach([
+    { "username": "admin", "password": hash },
+    { "username": "boss", "password": hash }
+    // etc.
+  ]);//to fill in
+
+  const martin = await Person.findOne({ name: "Martin Choy" });
+  const kenny = await Person.findOne({ name: "Kenny Cheng" });
+  const admin = await User.findOne({ username: "admin" });
+  const boss = await User.findOne({ username: "boss" });
+
+  await User.addToCollection(admin.id, 'supervises').members(kenny.id);
+  await User.addToCollection(boss.id, 'supervises').members([martin.id, kenny.id]);
 
   // By convention, this is a good place to set up fake data during development.
   //

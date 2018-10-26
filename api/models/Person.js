@@ -18,7 +18,7 @@ module.exports = {
     },
     age: {
       type: "number"
-    }
+    },
 
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -29,7 +29,10 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-
+    worksFor: {
+      collection: 'User',
+      via: 'supervises'
+    }
   },
 
   getInvalidIdMsg: function (opts) {
@@ -39,7 +42,7 @@ module.exports = {
 
     return null;        // falsy
 
-},
+  },
 
 };
 
