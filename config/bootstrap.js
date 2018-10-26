@@ -21,6 +21,12 @@ await Person.createEach([
     // etc.
 ]);
 
+await User.createEach([
+  { "username": "admin", "password": "123456" },
+  { "username": "boss", "password": "123456" }
+  // etc.
+]); //to fill in
+
   // By convention, this is a good place to set up fake data during development.
   //
   // For example:
