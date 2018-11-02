@@ -22,7 +22,17 @@ module.exports = {
       via: 'worksFor'
     },
 
+    username: {
+      type: 'string',
+      unique: true,
+      required: true
+    },
 
+    role: {
+      type: 'string',
+      enum: ['admin', 'tester', 'visitor'],
+      defaultsTo: 'visitor'
+  },
 
   },
 

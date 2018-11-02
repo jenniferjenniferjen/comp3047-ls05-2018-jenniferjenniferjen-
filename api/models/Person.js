@@ -20,6 +20,10 @@ module.exports = {
       type: "number"
     },
 
+    birthDate: {
+      type: 'ref',
+      columnType: 'datetime'
+  },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

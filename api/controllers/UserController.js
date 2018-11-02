@@ -40,8 +40,11 @@ module.exports = {
 
             // return res.json(req.session);
 
-            return res.ok("Login successfully");
-
+            if (req.wantsJSON){
+                return res.redirect('/person/index');
+            } else {
+                return res.ok("Login successfully");
+            }
         });
 
     },
